@@ -1,0 +1,34 @@
+{
+  "name": "swagger-express-validator",
+  "version": "1.0.0",
+  "description": "Validation middleware that validates request/response against provided swagger spec",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha ./test --ui bdd"
+  },
+  "keywords": [
+    "validation",
+    "swagger",
+    "middleware",
+    "connect",
+    "express"
+  ],
+  "author": "Nazar Gargol",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^4.10.3",
+    "debug": "^2.6.0",
+    "http-status-codes": "^1.0.6",
+    "lodash": "^4.17.3",
+    "path-to-regexp": "^1.7.0"
+  },
+  "devDependencies": {
+    "express": "^4.14.0",
+    "mocha": "^3.2.0",
+    "supertest": "^2.0.1",
+    "swagger-tools": "^0.10.1"
+  }
+}
