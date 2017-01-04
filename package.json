@@ -1,8 +1,15 @@
 {
   "name": "swagger-express-validator",
-  "version": "1.0.0",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "description": "Validation middleware that validates request/response against provided swagger spec",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gargol/swagger-express-validator"
+  },
   "directories": {
     "test": "test"
   },
