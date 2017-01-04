@@ -1,5 +1,6 @@
 const fs = require('fs');
 const spec = require('swagger-tools').specs.v2;
+const util = require('util');
 
 const file = process.argv[2];
 if (!file) {
@@ -7,18 +8,23 @@ if (!file) {
   process.exit(1);
 }
 
-fs.readFile(file, (err, schema) => {
+fs.readFile(file, { encoding: 'utf8' }, (err, schema) => {
   if (err) {
     console.log(err);
     process.exit(1);
   }
+  console.log('parsing schema:');
   const schemaJSON = JSON.parse(schema);
+  console.log(schemaJSON.host);
+  console.log('resolving $refs');
   spec.resolve(schemaJSON, (resolveErr, res) => {
     if (resolveErr) {
-      console.log(err);
+      console.log('resolve error:');
+      console.log(JSON.stringify(resolveErr));
       process.exit(1);
+    } else {
+      fs.writeFileSync(`resolved-${file}`, JSON.stringify(res));
+      process.exit();
     }
-    fs.writeFileSync(`resolved-${file}`, JSON.stringify(res));
-    process.exit();
   });
 });
