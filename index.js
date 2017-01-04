@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const debug = require('debug')('swagger-validator');
-const HttpStatus = require('http-status-codes');
 const Ajv = require('ajv');
 const util = require('util');
 const parseUrl = require('url').parse;
@@ -30,13 +29,13 @@ const matchUrlWithSchema = (reqUrl) => {
 };
 
 const resolveResponseModelSchema = (req, res) => {
-  const pathObj = matchUrlWithSchema(req.url);
+  const pathObj = matchUrlWithSchema(req.originalUrl);
   let statusSchema = null;
   if (pathObj) {
     const method = req.method.toLowerCase();
     const responseSchemas = pathObj[method].responses;
     const code = res.statusCode || 200;
-    if(responseSchemas[code]) {
+    if (responseSchemas[code]) {
       statusSchema = responseSchemas[code].schema;
     }
   }
@@ -67,7 +66,7 @@ const init = (opts = {}) => {
 };
 
 const validate = (req, res, next) => {
-  debug(`Processing: ${req.method} ${req.url}`);
+  debug(`Processing: ${req.method} ${req.originalUrl}`);
 
   if (options.validateRequest) {
     validateRequest(req, res, next);
@@ -81,34 +80,87 @@ const validateRequest = (req, res, next) => {
   next();
 };
 
+const sendData = (res, data, encoding) => {
+  // 'res.end' requires a Buffer or String so if it's not one, create a String
+  if (!(data instanceof Buffer) && !_.isString(data)) {
+    data = JSON.stringify(data);
+  }
+  res.end(data, encoding);
+};
+
+
 const validateResponse = (req, res, next) => {
-  const ajv = new Ajv({});
+  const ajv = new Ajv({ coerceTypes: true });
   const responseSchema = resolveResponseModelSchema(req, res);
   if (!responseSchema) {
     debug('Response validation skipped: no matching response schema');
   } else {
-    const validate = ajv.compile(responseSchema);
+    const validator = ajv.compile(responseSchema);
+    let val;
+    const origEnd = res.end;
+    const writtenData = [];
+    const origWrite = res.write;
 
-    const orig = res.json;
     // eslint-disable-next-line
-    res.json = function json(data) {
-      const validation = validate(data);
-      if (!validation) {
-        debug(`  Response validation errors: \n${util.inspect(validate.errors)}`);
-        if (options.responseValidationFn) {
-          options.responseValidationFn(req, data, validate.errors);
-          orig.call(this, data);
+    res.write = function (data) {
+      if (typeof data !== 'undefined') {
+        writtenData.push(data);
+      }
+    };
+
+    // eslint-disable-next-line
+    res.end = function (data, encoding) {
+      if (data) {
+        if (data instanceof Buffer) {
+          writtenData.push(data);
+          val = Buffer.concat(writtenData);
+        } else if (data instanceof String) {
+          writtenData.push(new Buffer(data));
+          val = Buffer.concat(writtenData);
         } else {
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR);
-          const args = {
-            code: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: `response schema validation failed for ${req.method}${req.url}`,
+          val = data;
+        }
+      } else if (writtenData.length !== 0) {
+        val = Buffer.concat(writtenData);
+      }
+
+      if (data instanceof Buffer) {
+        debug(data.toString(encoding));
+      }
+
+      res.write = origWrite;
+      res.end = origEnd;
+
+      if (val instanceof Buffer) {
+        val = val.toString(encoding);
+      }
+
+      if (_.isString(val)) {
+        try {
+          val = JSON.parse(val);
+        } catch (err) {
+          err.failedValidation = true;
+          err.message = 'Value expected to be an array/object but is not';
+
+          throw err;
+        }
+      }
+
+      const validation = validator(val);
+      if (!validation) {
+        debug(`  Response validation errors: \n${util.inspect(validator.errors)}`);
+        if (options.responseValidationFn) {
+          options.responseValidationFn(req, val, validator.errors);
+          sendData(res, val, encoding);
+        } else {
+          const err = {
+            message: `response schema validation failed for ${req.method}${req.originalUrl}`,
           };
-          orig.call(this, args);
+          next(err);
         }
       } else {
         debug('Response validation success');
-        orig.call(this, data);
+        sendData(res, val, encoding);
       }
     };
   }
