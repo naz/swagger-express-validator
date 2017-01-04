@@ -36,12 +36,22 @@ const resolveResponseModelSchema = (req, res) => {
     const method = req.method.toLowerCase();
     const responseSchemas = pathObj[method].responses;
     const code = res.statusCode || 200;
-    statusSchema = responseSchemas[code].schema;
+    if(responseSchemas[code]) {
+      statusSchema = responseSchemas[code].schema;
+    }
   }
 
   return statusSchema;
 };
 
+/**
+ *
+ * @param opts
+ * @param opts.validateResponse {boolean|true}
+ * @param opts.validateRequest {boolean|false}
+ * @param opts.responseValidationFn {function}
+ * @returns {function(*=, *=, *=)}
+ */
 const init = (opts = {}) => {
   debug('Initializing swagger-express-validator middleware');
   options = opts;
@@ -85,12 +95,17 @@ const validateResponse = (req, res, next) => {
       const validation = validate(data);
       if (!validation) {
         debug(`  Response validation errors: \n${util.inspect(validate.errors)}`);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR);
-        const args = {
-          code: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: `response schema validation failed for ${req.method}${req.url}`,
-        };
-        orig.call(this, args);
+        if (options.responseValidationFn) {
+          options.responseValidationFn(req, data, validate.errors);
+          orig.call(this, data);
+        } else {
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR);
+          const args = {
+            code: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: `response schema validation failed for ${req.method}${req.url}`,
+          };
+          orig.call(this, args);
+        }
       } else {
         debug('Response validation success');
         orig.call(this, data);
