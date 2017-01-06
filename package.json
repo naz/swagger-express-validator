@@ -30,7 +30,8 @@
     "debug": "^2.6.0",
     "http-status-codes": "^1.0.6",
     "lodash": "^4.17.3",
-    "path-to-regexp": "^1.7.0"
+    "path-to-regexp": "^1.7.0",
+    "validator": "^6.2.1"
   },
   "devDependencies": {
     "express": "^4.14.0",

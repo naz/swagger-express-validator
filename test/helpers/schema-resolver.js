@@ -13,7 +13,7 @@ fs.readFile(file, { encoding: 'utf8' }, (err, schema) => {
     console.log(err);
     process.exit(1);
   }
-  console.log('parsing schema:');
+  console.log('parsing schema for:');
   const schemaJSON = JSON.parse(schema);
   console.log(schemaJSON.host);
   console.log('resolving $refs');
@@ -23,6 +23,7 @@ fs.readFile(file, { encoding: 'utf8' }, (err, schema) => {
       console.log(JSON.stringify(resolveErr));
       process.exit(1);
     } else {
+      console.log(`saving resolved file to: resolved-${file}`);
       fs.writeFileSync(`resolved-${file}`, JSON.stringify(res));
       process.exit();
     }
