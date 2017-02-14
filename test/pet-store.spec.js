@@ -4,7 +4,7 @@ const describe = require('mocha/lib/mocha.js').describe;
 const it = require('mocha/lib/mocha.js').it;
 const { createServer } = require('./helpers');
 
-const spec = require('./swagger-schemas/pet-store.json');
+const schema = require('./swagger-schemas/pet-store.json');
 
 describe('validates basic response', () => {
   it('should process valid request', (done) => {
@@ -16,7 +16,7 @@ describe('validates basic response', () => {
         photoUrls: ['https://catphoto.com/best-cat'],
       });
     });
-    const app = createServer(router, spec);
+    const app = createServer(router, { schema });
 
     request(app)
       .get('/pet/1')
@@ -36,7 +36,7 @@ describe('validates basic response', () => {
         name: 'Pet Name',
       });
     });
-    const app = createServer(router, spec);
+    const app = createServer(router, { schema });
 
     request(app)
       .get('/pet/1')

@@ -9,7 +9,7 @@ const valueValidator = require('validator');
 let pathObjects = [];
 let options = {};
 
-const buildPathObjects = () => _.map(options.schema.paths, (pathDef, path) => {
+const buildPathObjects = (paths) => _.map(paths, (pathDef, path) => {
   return {
     definition: _.get(options.schema, ['paths', path]),
     original: ['paths', path],
@@ -47,6 +47,7 @@ const resolveResponseModelSchema = (req, res) => {
 /**
  *
  * @param opts
+ * @param opts.schema {object} json swagger schema
  * @param opts.validateResponse {boolean|true}
  * @param opts.validateRequest {boolean|false}
  * @param opts.responseValidationFn {function}
@@ -59,7 +60,7 @@ const init = (opts = {}) => {
     validateResponse: true,
   });
 
-  pathObjects = buildPathObjects(opts.spec);
+  pathObjects = buildPathObjects(options.schema.paths);
 
   return validate;
 };
