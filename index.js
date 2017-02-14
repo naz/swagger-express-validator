@@ -54,13 +54,11 @@ const resolveResponseModelSchema = (req, res) => {
  */
 const init = (opts = {}) => {
   debug('Initializing swagger-express-validator middleware');
-  options = opts;
-  if (_.isUndefined(options.validateResponse)) {
-    options.validateResponse = true;
-  }
-  if (_.isUndefined(options.validateRequest)) {
-    options.validateRequest = false;
-  }
+  options = _.defaults(opts, {
+    validateRequest: false,
+    validateResponse: true,
+  });
+
   pathObjects = buildPathObjects(opts.spec);
 
   return validate;
