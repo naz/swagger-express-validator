@@ -1,5 +1,7 @@
 :boom: WARNING! PACKAGE IS UNDER ACTIVE DEVELOPMENT
 
+[![Build Status](https://travis-ci.org/gargol/swagger-express-validator.svg?branch=master)](https://travis-ci.org/gargol/swagger-express-validator)
+
 `swagger-express-validator` is a lightweight middleware for request/response validation based on 
 swagger (2.0) specification. 
 
