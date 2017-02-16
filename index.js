@@ -44,19 +44,37 @@ const resolveResponseModelSchema = (req, res) => {
   return statusSchema;
 };
 
+const resolveRequestModelSchema = (req) => {
+  const pathObj = matchUrlWithSchema(req.originalUrl);
+  let schema = null;
+  if (pathObj) {
+    const method = req.method.toLowerCase();
+    let requestSchemas = null;
+    if (pathObj[method]) {
+      requestSchemas = pathObj[method].parameters;
+    }
+    if (requestSchemas && requestSchemas.length > 0) {
+      schema = requestSchemas[0].schema;
+    }
+  }
+
+  return schema;
+};
+
 /**
  *
  * @param opts
  * @param opts.schema {object} json swagger schema
  * @param opts.validateResponse {boolean|true}
  * @param opts.validateRequest {boolean|false}
+ * @param opts.requestValidationFn {function}
  * @param opts.responseValidationFn {function}
  * @returns {function(*=, *=, *=)}
  */
 const init = (opts = {}) => {
   debug('Initializing swagger-express-validator middleware');
   options = _.defaults(opts, {
-    validateRequest: false,
+    validateRequest: true,
     validateResponse: true,
   });
 
@@ -77,7 +95,40 @@ const validate = (req, res, next) => {
 };
 
 const validateRequest = (req, res, next) => {
-  next();
+  const ajv = new Ajv({
+    allErrors: true,
+    formats: {
+      int32: valueValidator.isInt,
+      int64: valueValidator.isInt,
+      url: valueValidator.isURL,
+    }
+  });
+
+  const requestSchema = resolveRequestModelSchema(req);
+
+  if (!requestSchema) {
+    debug('Request validation skipped: no matching request schema');
+    next();
+  } else {
+    const validator = ajv.compile(requestSchema);
+    const validation = validator(_.cloneDeep(req.body));
+    if (!validation) {
+      debug(`  Request validation errors: \n${util.inspect(validator.errors)}`);
+      if (options.requestValidationFn) {
+        options.requestValidationFn(req, req.body, validator.errors);
+        next();
+      } else {
+        const err = {
+          message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
+        };
+        res.status(400);
+        res.json(err);
+      }
+    } else {
+      debug('Response validation success');
+      next();
+    }
+  }
 };
 
 const sendData = (res, data, encoding) => {
@@ -94,6 +145,7 @@ const validateResponse = (req, res, next) => {
     allErrors: true,
     formats: {
       int32: valueValidator.isInt,
+      int64: valueValidator.isInt,
       url: valueValidator.isURL,
     }
   });
@@ -163,7 +215,7 @@ const validateResponse = (req, res, next) => {
           sendData(res, val, encoding);
         } else {
           const err = {
-            message: `response schema validation failed for ${req.method}${req.originalUrl}`,
+            message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
           };
           next(err);
         }
