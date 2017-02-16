@@ -29,8 +29,8 @@ describe('pet store', () => {
         .get('/pet/1')
         .expect(200)
         .end((err) => {
-          if (err) throw err;
           app.close();
+          if (err) throw err;
           done();
         });
     });
@@ -54,8 +54,8 @@ describe('pet store', () => {
           }
         })
         .end((err) => {
-          if (err) throw err;
           app.close();
+          if (err) throw err;
           done();
         });
     });
@@ -80,8 +80,8 @@ describe('pet store', () => {
         .get('/pet')
         .expect(200)
         .end((err) => {
-          if (err) throw err;
           app.close();
+          if (err) throw err;
           done();
         });
     });
@@ -101,8 +101,8 @@ describe('pet store', () => {
         })
         .expect(400)
         .end((err) => {
-          if (err) throw err;
           app.close();
+          if (err) throw err;
           done();
         });
     });
@@ -119,8 +119,30 @@ describe('pet store', () => {
         .post('/route-not-in-schema')
         .expect(200)
         .end((err) => {
-          if (err) throw err;
           app.close();
+          if (err) throw err;
+          done();
+        });
+    });
+
+    it('passes request that is valid for matching schema', (done) => {
+      const router = Router();
+      router.post('/pet', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .post('/pet')
+        .send({
+          name: 'Petty the Pet',
+          photoUrls: ['https://catphoto.com/best-cat'],
+        })
+        .expect(200)
+        .end((err) => {
+          app.close();
+          if (err) throw err;
           done();
         });
     });
