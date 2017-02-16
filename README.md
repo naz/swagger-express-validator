@@ -10,6 +10,10 @@ The main difference of this package to alternatives like
 configurable and only concentrates on validation against provided schema. You can choose the 
 behavior of invalid validation like returning a 500 or just logging an error to your logger.
 
+## Requirements
+- express ^4.0.0
+- body-parser ^1.0.0
+
 ##Features
 * Configurable validation behavior
 * [Fastest](https://github.com/ebdrup/json-schema-benchmark) available JSON schema validation based on [ajv](https://github.com/epoberezkin/ajv) library
@@ -24,8 +28,6 @@ Start using this library with `npm install swagger-express-validator --save`
 To see debug output use `DEBUG=swagger-express-validator` as an environmental varialbe when starting
 your project, eg.: `DEBUG=swagger-express-validator node server.js`. To gain more insights
 on how this works see documentation of [debug](https://github.com/visionmedia/debug) library
-
-
 
 ## Licence
 [MIT](https://github.com/gargol/swagger-express-validator/blob/master/LICENSE)

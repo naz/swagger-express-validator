@@ -28,15 +28,16 @@
   "dependencies": {
     "ajv": "^4.10.3",
     "debug": "^2.6.0",
-    "http-status-codes": "^1.0.6",
     "lodash": "^4.17.3",
     "path-to-regexp": "^1.7.0",
     "validator": "^6.2.1"
   },
   "devDependencies": {
+    "body-parser": "^1.16.1",
     "express": "^4.14.0",
     "mocha": "^3.2.0",
     "supertest": "^2.0.1",
-    "swagger-tools": "^0.10.1"
+    "swagger-tools": "^0.10.1",
+    "http-status-codes": "^1.0.6"
   }
 }
