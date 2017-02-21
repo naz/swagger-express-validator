@@ -9,15 +9,13 @@ const valueValidator = require('validator');
 let pathObjects = [];
 let options = {};
 
-const buildPathObjects = (paths) => _.map(paths, (pathDef, path) => {
-  return {
-    definition: _.get(options.schema, ['paths', path]),
-    original: ['paths', path],
-    regexp: pathToRegexp(path.replace(/\{/g, ':').replace(/\}/g, '')),
-    path,
-    pathDef,
-  };
-});
+const buildPathObjects = paths => _.map(paths, (pathDef, path) => ({
+  definition: _.get(options.schema, ['paths', path]),
+  original: ['paths', path],
+  regexp: pathToRegexp(path.replace(/\{/g, ':').replace(/\}/g, '')),
+  path,
+  pathDef,
+}));
 
 const matchUrlWithSchema = (reqUrl) => {
   const url = parseUrl(reqUrl).pathname;
@@ -61,39 +59,6 @@ const resolveRequestModelSchema = (req) => {
   return schema;
 };
 
-/**
- *
- * @param opts
- * @param opts.schema {object} json swagger schema
- * @param opts.validateResponse {boolean|true}
- * @param opts.validateRequest {boolean|false}
- * @param opts.requestValidationFn {function}
- * @param opts.responseValidationFn {function}
- * @returns {function(*=, *=, *=)}
- */
-const init = (opts = {}) => {
-  debug('Initializing swagger-express-validator middleware');
-  options = _.defaults(opts, {
-    validateRequest: true,
-    validateResponse: true,
-  });
-
-  pathObjects = buildPathObjects(options.schema.paths);
-
-  return validate;
-};
-
-const validate = (req, res, next) => {
-  debug(`Processing: ${req.method} ${req.originalUrl}`);
-
-  if (options.validateRequest) {
-    validateRequest(req, res, next);
-  }
-  if (options.validateResponse) {
-    validateResponse(req, res, next);
-  }
-};
-
 const validateRequest = (req, res, next) => {
   const ajv = new Ajv({
     allErrors: true,
@@ -101,7 +66,7 @@ const validateRequest = (req, res, next) => {
       int32: valueValidator.isInt,
       int64: valueValidator.isInt,
       url: valueValidator.isURL,
-    }
+    },
   });
 
   const requestSchema = resolveRequestModelSchema(req);
@@ -147,7 +112,7 @@ const validateResponse = (req, res, next) => {
       int32: valueValidator.isInt,
       int64: valueValidator.isInt,
       url: valueValidator.isURL,
-    }
+    },
   });
 
 
@@ -228,6 +193,41 @@ const validateResponse = (req, res, next) => {
 
   next();
 };
+
+
+const validate = (req, res, next) => {
+  debug(`Processing: ${req.method} ${req.originalUrl}`);
+
+  if (options.validateRequest) {
+    validateRequest(req, res, next);
+  }
+  if (options.validateResponse) {
+    validateResponse(req, res, next);
+  }
+};
+
+/**
+ *
+ * @param opts
+ * @param opts.schema {object} json swagger schema
+ * @param opts.validateResponse {boolean|true}
+ * @param opts.validateRequest {boolean|false}
+ * @param opts.requestValidationFn {function}
+ * @param opts.responseValidationFn {function}
+ * @returns {function(*=, *=, *=)}
+ */
+const init = (opts = {}) => {
+  debug('Initializing swagger-express-validator middleware');
+  options = _.defaults(opts, {
+    validateRequest: true,
+    validateResponse: true,
+  });
+
+  pathObjects = buildPathObjects(options.schema.paths);
+
+  return validate;
+};
+
 
 module.exports = init;
 

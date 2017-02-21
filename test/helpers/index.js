@@ -8,7 +8,7 @@ const createServer = (requestHandler, opts) => {
   server.use(bodyParser.json());
   server.use(validator(opts));
   server.use('/', requestHandler);
-  server.use((err, req, res, next) => {
+  server.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     res.status(HttpStatus.INTERNAL_SERVER_ERROR);
     res.json(err);
   });

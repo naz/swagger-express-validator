@@ -1,6 +1,6 @@
 const fs = require('fs');
 const spec = require('swagger-tools').specs.v2;
-const util = require('util');
+const console = require('console');
 
 const file = process.argv[2];
 if (!file) {
