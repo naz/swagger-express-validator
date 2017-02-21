@@ -14,7 +14,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha ./test --ui bdd"
+    "test": "mocha ./test --ui bdd",
+    "precommit": "npm test",
+    "prepush": "npm test"
   },
   "keywords": [
     "validation",
@@ -35,9 +37,10 @@
   "devDependencies": {
     "body-parser": "^1.16.1",
     "express": "^4.14.0",
+    "http-status-codes": "^1.0.6",
+    "husky": "^0.13.1",
     "mocha": "^3.2.0",
     "supertest": "^2.0.1",
-    "swagger-tools": "^0.10.1",
-    "http-status-codes": "^1.0.6"
+    "swagger-tools": "^0.10.1"
   }
 }
