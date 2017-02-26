@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/gargol/swagger-express-validator.svg?branch=master)](https://travis-ci.org/gargol/swagger-express-validator)
 
 `swagger-express-validator` is a lightweight middleware for request/response validation based on 
-swagger (2.0) specification. 
+[OpenAPI v2.0](http://swagger.io/specification/) (aka swagger) specification. 
 
 The main difference of this package to alternatives like 
 [swagger-tools](https://github.com/apigee-127/swagger-tools) is that this package is very
@@ -23,6 +23,45 @@ behavior of invalid validation like returning a 500 or just logging an error to 
  
 ##Installation
 Start using this library with `npm install swagger-express-validator --save`
+
+##Sample use
+To set up simple validation for your requests and responses:
+```javascript
+const util = require('util');
+const express = require('express');
+const bodyParser = require('body-parser');
+const validator = require('swagger-express-validator');
+const schema = require('./api-schema.json');
+
+const server = express();
+server.use(bodyParser.json());
+
+const opts = {
+  schema,
+  validateRequest: true,
+  validateResponse: true,
+  requestValidationFn: (req, data, errors) => {
+    console.log(`failed request validation: ${req.method} ${req.originalUrl}\n ${util.inspect(errors)}`)
+  },
+  responseValidationFn: (req, data, errors) => {
+    console.log(`failed response validation: ${req.method} ${req.originalUrl}\n ${util.inspect(errors)}`)
+  },
+};
+server.use(validator(opts));
+
+server.use('/status', (req, res) => {
+  res.json({
+    status: 'OK',
+  })
+});
+server.use((err, req, res, next) => {
+  res.status(500);
+  res.json(err);
+});
+
+return server.listen(3000);
+
+```
 
 ##Debugging
 To see debug output use `DEBUG=swagger-express-validator` as an environmental varialbe when starting
