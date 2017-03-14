@@ -19,6 +19,7 @@ describe('pet store', () => {
       router.get('/pet/:id', (req, res) => {
         res.json({
           id: 1,
+          age: 21,
           name: 'Pet Name',
           photoUrls: ['https://catphoto.com/best-cat'],
         });
@@ -53,6 +54,28 @@ describe('pet store', () => {
             throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
           }
         })
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
+
+    it('allows `nullable` filed in response', (done) => {
+      const router = Router();
+      router.get('/pet/:id', (req, res) => {
+        res.json({
+          id: 1,
+          age: null,
+          name: 'Pet Name',
+          photoUrls: [],
+        });
+      });
+      const app = createServer(router, serverOpts);
+
+      request(app)
+        .get('/pet/1')
+        .expect(200)
         .end((err) => {
           app.close();
           if (err) throw err;

@@ -27,19 +27,38 @@ const matchUrlWithSchema = (reqUrl) => {
   return match;
 };
 
+const decorateWithNullable = (schema) => {
+  if (schema && schema.properties) {
+    Object.keys(schema.properties).forEach((prop) => {
+      if (schema.properties[prop]['x-nullable']) {
+        schema.properties[prop] = {
+          oneOf: [
+            schema.properties[prop],
+            { type: 'null' },
+          ],
+        };
+      }
+    });
+  }
+  return schema;
+};
+
 const resolveResponseModelSchema = (req, res) => {
   const pathObj = matchUrlWithSchema(req.originalUrl);
-  let statusSchema = null;
+  let schema = null;
   if (pathObj) {
     const method = req.method.toLowerCase();
     const responseSchemas = pathObj[method].responses;
     const code = res.statusCode || 200;
     if (responseSchemas[code]) {
-      statusSchema = responseSchemas[code].schema;
+      schema = responseSchemas[code].schema;
     }
   }
 
-  return statusSchema;
+  if (options.allowNullable) {
+    schema = decorateWithNullable(schema);
+  }
+  return schema;
 };
 
 const resolveRequestModelSchema = (req) => {
@@ -55,7 +74,9 @@ const resolveRequestModelSchema = (req) => {
       schema = requestSchemas[0].schema;
     }
   }
-
+  if (options.allowNullable) {
+    schema = decorateWithNullable(schema);
+  }
   return schema;
 };
 
@@ -114,7 +135,6 @@ const validateResponse = (req, res, next) => {
       url: valueValidator.isURL,
     },
   });
-
 
   let val;
   const origEnd = res.end;
@@ -211,7 +231,8 @@ const validate = (req, res, next) => {
  * @param opts
  * @param opts.schema {object} json swagger schema
  * @param opts.validateResponse {boolean|true}
- * @param opts.validateRequest {boolean|false}
+ * @param opts.validateRequest {boolean|true}
+ * @param opts.allowNullable {boolean|true}
  * @param opts.requestValidationFn {function}
  * @param opts.responseValidationFn {function}
  * @returns {function(*=, *=, *=)}
@@ -221,6 +242,7 @@ const init = (opts = {}) => {
   options = _.defaults(opts, {
     validateRequest: true,
     validateResponse: true,
+    allowNullable: true,
   });
 
   pathObjects = buildPathObjects(options.schema.paths);

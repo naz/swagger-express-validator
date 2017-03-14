@@ -555,6 +555,7 @@
               "type": "object",
               "required": [
                 "name",
+                "age",
                 "photoUrls"
               ],
               "properties": {
@@ -588,6 +589,11 @@
                   "items": {
                     "type": "string"
                   }
+                },
+                "age": {
+                  "type": "integer",
+                  "format": "int64",
+                  "x-nullable": true
                 },
                 "tags": {
                   "type": "array",
