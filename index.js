@@ -39,6 +39,8 @@ const decorateWithNullable = (schema) => {
         };
       }
     });
+  } else if (schema && schema.items) {
+    schema.items = decorateWithNullable(schema.items);
   }
   return schema;
 };
