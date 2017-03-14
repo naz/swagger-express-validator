@@ -20,6 +20,7 @@ behavior of invalid validation like returning a 500 or just logging an error to 
 * Optional validations for either request parameters or response values
 * Independent from express application structure. This is a simple drop-in middleware without additional
  alterations to your swagger definitions or application routing.
+* Support for nullable field validation though `x-nullable` attribute
  
 ##Installation
 Start using this library with `npm install swagger-express-validator --save`
