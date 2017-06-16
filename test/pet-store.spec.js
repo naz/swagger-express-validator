@@ -169,5 +169,26 @@ describe('pet store', () => {
           done();
         });
     });
+
+    it('checks for basePath in schema when matching URL', (done) => {
+      const router = Router();
+      router.post('/v2/pet', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .post('/v2/pet')
+        .send({
+          name: 'hello',
+        })
+        .expect(400)
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
   });
 });
