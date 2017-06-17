@@ -18,7 +18,10 @@ const buildPathObjects = paths => _.map(paths, (pathDef, path) => ({
 }));
 
 const matchUrlWithSchema = (reqUrl) => {
-  const url = parseUrl(reqUrl).pathname;
+  let url = parseUrl(reqUrl).pathname;
+  if (options.schema.basePath) {
+    url = url.replace(options.schema.basePath, '');
+  }
   const pathObj = pathObjects.filter(obj => url.match(obj.regexp));
   let match = null;
   if (pathObj[0]) {
