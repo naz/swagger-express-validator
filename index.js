@@ -85,43 +85,6 @@ const resolveRequestModelSchema = (req) => {
   return schema;
 };
 
-const validateRequest = (req, res, next) => {
-  const ajv = new Ajv({
-    allErrors: true,
-    formats: {
-      int32: valueValidator.isInt,
-      int64: valueValidator.isInt,
-      url: valueValidator.isURL,
-    },
-  });
-
-  const requestSchema = resolveRequestModelSchema(req);
-
-  if (!requestSchema) {
-    debug('Request validation skipped: no matching request schema');
-    next();
-  } else {
-    const validator = ajv.compile(requestSchema);
-    const validation = validator(_.cloneDeep(req.body));
-    if (!validation) {
-      debug(`  Request validation errors: \n${util.inspect(validator.errors)}`);
-      if (options.requestValidationFn) {
-        options.requestValidationFn(req, req.body, validator.errors);
-        next();
-      } else {
-        const err = {
-          message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
-        };
-        res.status(400);
-        res.json(err);
-      }
-    } else {
-      debug('Response validation success');
-      next();
-    }
-  }
-};
-
 const sendData = (res, data, encoding) => {
   // 'res.end' requires a Buffer or String so if it's not one, create a String
   if (!(data instanceof Buffer) && !_.isString(data)) {
@@ -129,7 +92,6 @@ const sendData = (res, data, encoding) => {
   }
   res.end(data, encoding);
 };
-
 
 const validateResponse = (req, res, next) => {
   const ajv = new Ajv({
@@ -219,14 +181,57 @@ const validateResponse = (req, res, next) => {
   next();
 };
 
+const validateRequest = (req, res, next) => {
+  const ajv = new Ajv({
+    allErrors: true,
+    formats: {
+      int32: valueValidator.isInt,
+      int64: valueValidator.isInt,
+      url: valueValidator.isURL,
+    },
+  });
+
+  const requestSchema = resolveRequestModelSchema(req);
+
+  if (!requestSchema) {
+    debug('Request validation skipped: no matching request schema');
+    if (options.validateResponse) {
+      validateResponse(req, res, next);
+    } else {
+      next();
+    }
+  } else {
+    const validator = ajv.compile(requestSchema);
+    const validation = validator(_.cloneDeep(req.body));
+    if (!validation) {
+      debug(`  Request validation errors: \n${util.inspect(validator.errors)}`);
+      if (options.requestValidationFn) {
+        options.requestValidationFn(req, req.body, validator.errors);
+        next();
+      } else {
+        const err = {
+          message: `Request schema validation failed for ${req.method}${req.originalUrl}`,
+        };
+        res.status(400);
+        res.json(err);
+      }
+    } else {
+      debug('Request validation success');
+      if (options.validateResponse) {
+        validateResponse(req, res, next);
+      } else {
+        next();
+      }
+    }
+  }
+};
 
 const validate = (req, res, next) => {
   debug(`Processing: ${req.method} ${req.originalUrl}`);
 
   if (options.validateRequest) {
     validateRequest(req, res, next);
-  }
-  if (options.validateResponse) {
+  } else if (options.validateResponse) {
     validateResponse(req, res, next);
   }
 };

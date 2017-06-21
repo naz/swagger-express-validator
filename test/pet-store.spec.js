@@ -191,4 +191,102 @@ describe('pet store', () => {
         });
     });
   });
+
+  describe('validates requests and responses', () => {
+    const serverOpts = {
+      schema,
+      validateRequest: true,
+      validateResponse: true,
+    };
+
+    it('fails request with 400 when doesn\'t pass request schema validation', (done) => {
+      const router = Router();
+      router.post('/pet', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .post('/pet')
+        .send({
+          name: 'hello',
+        })
+        .expect(400)
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
+
+    it('passes request that is valid for matching schema', (done) => {
+      const router = Router();
+      router.post('/pet', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .post('/pet')
+        .send({
+          name: 'Petty the Pet',
+          photoUrls: ['https://catphoto.com/best-cat'],
+        })
+        .expect(200)
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
+
+    it('should process valid response', (done) => {
+      const router = Router();
+      router.get('/pet/:id', (req, res) => {
+        res.json({
+          id: 1,
+          age: 21,
+          name: 'Pet Name',
+          photoUrls: ['https://catphoto.com/best-cat'],
+        });
+      });
+      const app = createServer(router, serverOpts);
+
+      request(app)
+        .get('/pet/1')
+        .expect(200)
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
+
+    it('fails with 500 response code due to invalid response object', (done) => {
+      const router = Router();
+      router.get('/pet/:id', (req, res) => {
+        res.json({
+          // id: 1,
+          name: 'Pet Name',
+        });
+      });
+      const app = createServer(router, serverOpts);
+
+      request(app)
+        .get('/pet/1')
+        .expect(500)
+        .expect((res) => {
+          if (!res.body.message.includes('Response schema validation failed')) {
+            throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
+          }
+        })
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
+  });
 });
