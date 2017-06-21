@@ -111,6 +111,7 @@ const validateRequest = (req, res, next) => {
       } else {
         const err = {
           message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
+          errors: validator.errors,
         };
         res.status(400);
         res.json(err);
@@ -206,6 +207,7 @@ const validateResponse = (req, res, next) => {
         } else {
           const err = {
             message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
+            errors: validator.errors,
           };
           next(err);
         }
