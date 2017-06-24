@@ -1,4 +1,5 @@
-:boom: WARNING! PACKAGE IS UNDER ACTIVE DEVELOPMENT
+Swagger Express Validator
+=========================
 
 [![Build Status](https://travis-ci.org/gargol/swagger-express-validator.svg?branch=master)](https://travis-ci.org/gargol/swagger-express-validator)
 
@@ -14,7 +15,7 @@ behavior of invalid validation like returning a 500 or just logging an error to 
 - express ^4.0.0
 - body-parser ^1.0.0
 
-##Features
+## Features
 * Configurable validation behavior
 * [Fastest](https://github.com/ebdrup/json-schema-benchmark) available JSON schema validation based on [ajv](https://github.com/epoberezkin/ajv) library
 * Optional validations for either request parameters or response values
@@ -22,10 +23,10 @@ behavior of invalid validation like returning a 500 or just logging an error to 
  alterations to your swagger definitions or application routing.
 * Support for nullable field validation though `x-nullable` attribute
  
-##Installation
+## Installation
 Start using this library with `npm install swagger-express-validator --save`
 
-##Sample use
+## Sample use
 To set up simple validation for your requests and responses:
 ```javascript
 const util = require('util');
@@ -64,13 +65,17 @@ return server.listen(3000);
 
 ```
 
-##Debugging
+## Debugging
 To see debug output use `DEBUG=swagger-express-validator` as an environmental varialbe when starting
 your project, eg.: `DEBUG=swagger-express-validator node server.js`. To gain more insights
 on how this works see documentation of [debug](https://github.com/visionmedia/debug) library
 
+## Contributors
+- [Nazar Gargol](https://github.com/gargol)
+- [Isaac Stefanek](https://github.com/iadknet)
+
 ## Licence
 [MIT](https://github.com/gargol/swagger-express-validator/blob/master/LICENSE)
 
-Special thanks to @bgaluszka for inspiration :)
+Special thanks to @bgaluszka for initial inspiration :)
 
