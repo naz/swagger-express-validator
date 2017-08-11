@@ -233,6 +233,8 @@ const validate = (req, res, next) => {
     validateRequest(req, res, next);
   } else if (options.validateResponse) {
     validateResponse(req, res, next);
+  } else {
+    next();
   }
 };
 
