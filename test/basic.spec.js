@@ -86,6 +86,7 @@ describe('basic', () => {
       validateRequest: true,
       validateResponse: false,
     };
+
     it('passes request through when no request body needed', (done) => {
       const router = Router();
       router.get('/status', (req, res) => {
@@ -114,6 +115,31 @@ describe('basic', () => {
       const app = createServer(router, serverOpts);
       request(app)
         .get('/route-not-in-schema')
+        .expect(200)
+        .end((err) => {
+          if (err) throw err;
+          app.close();
+          done();
+        });
+    });
+  });
+
+  describe('do not validate', () => {
+    it('passes request through when no request body needed', (done) => {
+      const serverOpts = {
+        schema,
+        validateRequest: false,
+        validateResponse: false,
+      };
+      const router = Router();
+      router.get('/status', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .get('/status')
         .expect(200)
         .end((err) => {
           if (err) throw err;
