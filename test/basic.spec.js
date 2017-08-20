@@ -125,11 +125,33 @@ describe('basic', () => {
   });
 
   describe('do not validate', () => {
-    it('passes request through when no request body needed', (done) => {
+    it('passes request through when when both validations are set to false', (done) => {
       const serverOpts = {
         schema,
         validateRequest: false,
         validateResponse: false,
+      };
+      const router = Router();
+      router.get('/status', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .get('/status')
+        .expect(200)
+        .end((err) => {
+          if (err) throw err;
+          app.close();
+          done();
+        });
+    });
+
+    it('passes request through when no request body needed', (done) => {
+      const serverOpts = {
+        validateRequest: true,
+        validateResponse: true,
       };
       const router = Router();
       router.get('/status', (req, res) => {

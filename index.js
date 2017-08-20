@@ -229,7 +229,9 @@ const validateRequest = (req, res, next) => {
 const validate = (req, res, next) => {
   debug(`Processing: ${req.method} ${req.originalUrl}`);
 
-  if (options.validateRequest) {
+  if (pathObjects.length === 0) {
+    next();
+  } else if (options.validateRequest) {
     validateRequest(req, res, next);
   } else if (options.validateResponse) {
     validateResponse(req, res, next);
@@ -257,11 +259,14 @@ const init = (opts = {}) => {
     allowNullable: true,
   });
 
-  pathObjects = buildPathObjects(options.schema.paths);
+  if (options.schema) {
+    pathObjects = buildPathObjects(options.schema.paths);
+  } else {
+    debug('Please provide schema option to properly initialize middleware');
+    pathObjects = [];
+  }
 
   return validate;
 };
 
-
 module.exports = init;
-
