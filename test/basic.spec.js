@@ -52,6 +52,28 @@ describe('basic', () => {
         });
     });
 
+    it('passes request for invalid URL through', (done) => {
+      const router = Router();
+      router.get('/status', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, {
+        schema,
+        validateRequest: false,
+        validateResponse: true,
+      });
+      request(app)
+        .put('/status')
+        .expect(404)
+        .end((err) => {
+          if (err) throw err;
+          app.close();
+          done();
+        });
+    });
+
     it('passes response that is not defined in the schema', (done) => {
       const router = Router();
       router.get('/route-not-in-schema', (req, res) => {
@@ -137,6 +159,24 @@ describe('basic', () => {
       const app = createServer(router, serverOpts);
       request(app)
         .get('/invalid')
+        .expect(404)
+        .end((err) => {
+          if (err) throw err;
+          app.close();
+          done();
+        });
+    });
+
+    it('passes through when valid URL invalid method', (done) => {
+      const router = Router();
+      router.get('/status', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .put('/status')
         .expect(404)
         .end((err) => {
           if (err) throw err;
