@@ -53,10 +53,12 @@ const resolveResponseModelSchema = (req, res) => {
   let schema = null;
   if (pathObj) {
     const method = req.method.toLowerCase();
-    const responseSchemas = pathObj[method].responses;
-    const code = res.statusCode || 200;
-    if (responseSchemas[code]) {
-      schema = responseSchemas[code].schema;
+    if (pathObj[method]) {
+      const responseSchemas = pathObj[method].responses;
+      const code = res.statusCode || 200;
+      if (responseSchemas[code]) {
+        schema = responseSchemas[code].schema;
+      }
     }
   }
 
