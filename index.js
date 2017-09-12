@@ -48,6 +48,11 @@ const decorateWithNullable = (schema) => {
   return schema;
 };
 
+const decorateWithDefinitions = (schema) => {
+  schema.definitions = _.assign({}, options.schema.definitions || {}, schema.definitions || {});
+  return schema;
+};
+
 const resolveResponseModelSchema = (req, res) => {
   const pathObj = matchUrlWithSchema(req.originalUrl);
   let schema = null;
@@ -65,6 +70,11 @@ const resolveResponseModelSchema = (req, res) => {
   if (options.allowNullable) {
     schema = decorateWithNullable(schema);
   }
+
+  if (options.schema.definitions && schema) {
+    schema = decorateWithDefinitions(schema);
+  }
+
   return schema;
 };
 
@@ -83,6 +93,9 @@ const resolveRequestModelSchema = (req) => {
   }
   if (options.allowNullable) {
     schema = decorateWithNullable(schema);
+  }
+  if (options.schema.definitions && schema) {
+    schema = decorateWithDefinitions(schema);
   }
   return schema;
 };
