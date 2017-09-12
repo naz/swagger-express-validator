@@ -8,7 +8,7 @@ const schema = require('./swagger-schemas/basic.json');
 
 describe('basic', () => {
   describe('validates basic response', () => {
-    it('passes response through', (done) => {
+    it('passes successful response through', (done) => {
       const router = Router();
       router.get('/status', (req, res) => {
         res.json({
@@ -23,6 +23,28 @@ describe('basic', () => {
       request(app)
         .get('/status')
         .expect(200)
+        .end((err) => {
+          if (err) throw err;
+          app.close();
+          done();
+        });
+    });
+
+    it('passes request for invalid URL through', (done) => {
+      const router = Router();
+      router.get('/status', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, {
+        schema,
+        validateRequest: false,
+        validateResponse: true,
+      });
+      request(app)
+        .get('/invalid')
+        .expect(404)
         .end((err) => {
           if (err) throw err;
           app.close();
@@ -98,6 +120,24 @@ describe('basic', () => {
       request(app)
         .get('/status')
         .expect(200)
+        .end((err) => {
+          if (err) throw err;
+          app.close();
+          done();
+        });
+    });
+
+    it('passes through when invalid URL', (done) => {
+      const router = Router();
+      router.get('/status', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .get('/invalid')
+        .expect(404)
         .end((err) => {
           if (err) throw err;
           app.close();
