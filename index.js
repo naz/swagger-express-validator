@@ -103,7 +103,6 @@ const validateResponse = (req, res, next) => {
     },
   });
 
-  let val;
   const origEnd = res.end;
   const writtenData = [];
   const origWrite = res.write;
@@ -117,47 +116,49 @@ const validateResponse = (req, res, next) => {
 
   // eslint-disable-next-line
   res.end = function (data, encoding) {
-    if (data) {
-      if (data instanceof Buffer) {
-        writtenData.push(data);
-        val = Buffer.concat(writtenData);
-      } else if (data instanceof String) {
-        writtenData.push(new Buffer(data));
-        val = Buffer.concat(writtenData);
-      } else {
-        val = data;
-      }
-    } else if (writtenData.length !== 0) {
-      val = Buffer.concat(writtenData);
-    }
-
-    if (data instanceof Buffer) {
-      debug(data.toString(encoding));
-    }
-
     res.write = origWrite;
     res.end = origEnd;
-
-    if (val instanceof Buffer) {
-      val = val.toString(encoding);
-    }
-
-    if (_.isString(val)) {
-      try {
-        val = JSON.parse(val);
-      } catch (err) {
-        err.failedValidation = true;
-        err.message = 'Value expected to be an array/object but is not';
-
-        throw err;
-      }
-    }
 
     const responseSchema = resolveResponseModelSchema(req, res);
     if (!responseSchema) {
       debug('Response validation skipped: no matching response schema');
-      sendData(res, val, encoding);
+      sendData(res, data, encoding);
     } else {
+      let val;
+
+      if (data) {
+        if (data instanceof Buffer) {
+          writtenData.push(data);
+          val = Buffer.concat(writtenData);
+        } else if (data instanceof String) {
+          writtenData.push(new Buffer(data));
+          val = Buffer.concat(writtenData);
+        } else {
+          val = data;
+        }
+      } else if (writtenData.length !== 0) {
+        val = Buffer.concat(writtenData);
+      }
+
+      if (data instanceof Buffer) {
+        debug(data.toString(encoding));
+      }
+
+      if (val instanceof Buffer) {
+        val = val.toString(encoding);
+      }
+
+      if (_.isString(val)) {
+        try {
+          val = JSON.parse(val);
+        } catch (err) {
+          err.failedValidation = true;
+          err.message = 'Value expected to be an array/object but is not';
+
+          throw err;
+        }
+      }
+
       const validator = ajv.compile(responseSchema);
       const validation = validator(_.cloneDeep(val));
       if (!validation) {
