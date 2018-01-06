@@ -63,6 +63,7 @@ const resolveResponseModelSchema = (req, res) => {
   if (options.allowNullable) {
     schema = decorateWithNullable(schema);
   }
+  schema.definitions= options.schema.definitions
   return schema;
 };
 
@@ -82,6 +83,7 @@ const resolveRequestModelSchema = (req) => {
   if (options.allowNullable) {
     schema = decorateWithNullable(schema);
   }
+  schema.definitions= options.schema.definitions
   return schema;
 };
 
