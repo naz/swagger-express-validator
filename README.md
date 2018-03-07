@@ -73,6 +73,7 @@ on how this works see documentation of [debug](https://github.com/visionmedia/de
 ## Contributors
 - [Nazar Gargol](https://github.com/gargol)
 - [Isaac Stefanek](https://github.com/iadknet)
+- [James Gregory](https://github.com/jagregory)
 
 ## Licence
 [MIT](https://github.com/gargol/swagger-express-validator/blob/master/LICENSE)
