@@ -1,6 +1,6 @@
 {
   "name": "swagger-express-validator",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "engines": {
     "node": ">=6.0.0"
   },
