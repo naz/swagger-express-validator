@@ -78,5 +78,5 @@ on how this works see documentation of [debug](https://github.com/visionmedia/de
 ## Licence
 [MIT](https://github.com/gargol/swagger-express-validator/blob/master/LICENSE)
 
-Special thanks to @bgaluszka for initial inspiration :)
+Special thanks to [@bgaluszka](https://github.com/bgaluszka) for initial inspiration :)
 
