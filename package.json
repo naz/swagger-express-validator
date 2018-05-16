@@ -29,22 +29,21 @@
   "author": "Nazar Gargol",
   "license": "MIT",
   "dependencies": {
-    "ajv": "^4.10.3",
-    "debug": "^2.6.0",
-    "lodash": "^4.17.3",
-    "path-to-regexp": "^1.7.0",
-    "validator": "^6.2.1"
+    "ajv": "~6.5.0",
+    "debug": "~3.1.0",
+    "lodash": "~4.17.3",
+    "path-to-regexp": "~2.2.1",
+    "validator": "~10.2.0"
   },
   "devDependencies": {
     "body-parser": "^1.16.1",
-    "eslint": "^3.16.0",
-    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.2.0",
     "express": "^4.14.0",
     "http-status-codes": "^1.0.6",
-    "husky": "^0.13.1",
-    "mocha": "^3.2.0",
-    "supertest": "^2.0.1",
-    "swagger-tools": "^0.10.1"
+    "husky": "^0.14.3",
+    "mocha": "^5.1.0",
+    "supertest": "^3.1.0"
   }
 }
