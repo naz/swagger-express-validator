@@ -6,12 +6,7 @@
     "mocha": true
   },
   "rules": {
-    "no-param-reassign": 0,
-    "prefer-destructuring": 0,
-    "no-buffer-constructor": 0
-  },
-  "ecmaFeatures": {
-    "modules": true
+    "no-param-reassign": 0
   },
   "settings": {
     "import/resolve": {

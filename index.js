@@ -62,7 +62,7 @@ const resolveResponseModelSchema = (req, res) => {
       const responseSchemas = pathObj[method].responses;
       const code = res.statusCode || 200;
       if (responseSchemas[code]) {
-        schema = responseSchemas[code].schema;
+        ({ schema } = responseSchemas[code]);
       }
     }
   }
@@ -88,7 +88,7 @@ const resolveRequestModelSchema = (req) => {
       requestSchemas = pathObj[method].parameters;
     }
     if (requestSchemas && requestSchemas.length > 0) {
-      schema = requestSchemas[0].schema;
+      ([{ schema }] = requestSchemas);
     }
   }
   if (options.allowNullable) {
@@ -146,7 +146,7 @@ const validateResponse = (req, res, next) => {
           writtenData.push(data);
           val = Buffer.concat(writtenData);
         } else if (data instanceof String) {
-          writtenData.push(new Buffer(data));
+          writtenData.push(Buffer.from(data));
           val = Buffer.concat(writtenData);
         } else {
           val = data;
