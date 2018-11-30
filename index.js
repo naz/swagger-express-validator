@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const debug = require('debug')('swagger-validator');
+const debug = require('debug')('swagger-express-validator');
 const Ajv = require('ajv');
 const util = require('util');
 const parseUrl = require('url').parse;

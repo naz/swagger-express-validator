@@ -66,7 +66,7 @@ return server.listen(3000);
 ```
 
 ## Debugging
-To see debug output use `DEBUG=swagger-express-validator` as an environmental varialbe when starting
+To see debug output use `DEBUG=swagger-express-validator` as an environmental variable when starting
 your project, eg.: `DEBUG=swagger-express-validator node server.js`. To gain more insights
 on how this works see documentation of [debug](https://github.com/visionmedia/debug) library
 
