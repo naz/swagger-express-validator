@@ -17,11 +17,19 @@ const buildPathObjects = paths => _.map(paths, (pathDef, path) => ({
   pathDef,
 }));
 
+const stripBasePath = (url) => {
+    const basePath = options.schema.basePath;
+
+    if (basePath && (url.indexOf(basePath) == 0)) {
+        return url.slice(basePath.length);
+    } else {
+        return url;
+    }
+};
+
 const matchUrlWithSchema = (reqUrl) => {
-  let url = parseUrl(reqUrl).pathname;
-  if (options.schema.basePath) {
-    url = url.replace(options.schema.basePath, '');
-  }
+  let url = stripBasePath(parseUrl(reqUrl).pathname);
+
   const pathObj = pathObjects.filter(obj => url.match(obj.regexp));
   let match = null;
   if (pathObj[0]) {
