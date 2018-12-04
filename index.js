@@ -144,7 +144,7 @@ const validateResponse = (req, res, next) => {
 
     const responseSchema = resolveResponseModelSchema(req, res);
     if (!responseSchema) {
-      debug('Response validation skipped: no matching response schema');
+      debug(`Response validation skipped: no matching response schema for ${req.method} ${req.originalUrl}`);
       sendData(res, data, encoding);
     } else {
       let val;
@@ -191,7 +191,7 @@ const validateResponse = (req, res, next) => {
           sendData(res, val, encoding);
         } else {
           const err = {
-            message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
+            message: `Response schema validation failed for ${req.method} ${req.originalUrl}`,
           };
           next(err);
         }
@@ -218,7 +218,7 @@ const validateRequest = (req, res, next) => {
   const requestSchema = resolveRequestModelSchema(req);
 
   if (!requestSchema) {
-    debug('Request validation skipped: no matching request schema');
+    debug(`Request validation skipped: no matching request schema for ${req.method} ${req.originalUrl}`);
     if (options.validateResponse) {
       validateResponse(req, res, next);
     } else {
@@ -228,19 +228,19 @@ const validateRequest = (req, res, next) => {
     const validator = ajv.compile(requestSchema);
     const validation = validator(_.cloneDeep(req.body));
     if (!validation) {
-      debug(`  Request validation errors: \n${util.inspect(validator.errors)}`);
+      debug(`  Request validation errors for ${req.method} ${req.originalUrl}: \n${util.inspect(validator.errors)}`);
       if (options.requestValidationFn) {
         options.requestValidationFn(req, req.body, validator.errors);
         next();
       } else {
         const err = {
-          message: `Request schema validation failed for ${req.method}${req.originalUrl}`,
+          message: `Request schema validation failed for ${req.method} ${req.originalUrl}`,
         };
         res.status(400);
         res.json(err);
       }
     } else {
-      debug('Request validation success');
+      debug(`Request validation success for ${req.method} ${req.originalUrl}`);
       if (options.validateResponse) {
         validateResponse(req, res, next);
       } else {
