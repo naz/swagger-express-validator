@@ -190,6 +190,27 @@ describe('pet store', () => {
           done();
         });
     });
+
+    it('uses correct body parameter when other parameters exist', (done) => {
+      const router = Router();
+      router.put('/user/name', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .put('/user/name')
+        .send({
+          id: 'not_integer',
+        })
+        .expect(400)
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
   });
 
   describe('validates requests and responses', () => {
