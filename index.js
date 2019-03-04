@@ -9,13 +9,14 @@ const valueValidator = require('validator');
 let pathObjects = [];
 let options = {};
 
-const buildPathObjects = paths => _.map(paths, (pathDef, path) => ({
-  definition: _.get(options.schema, ['paths', path]),
-  original: ['paths', path],
-  regexp: pathToRegexp(path.replace(/\{/g, ':').replace(/\}/g, '')),
-  path,
-  pathDef,
-}));
+const buildPathObjects = paths =>
+  _.map(paths, (pathDef, path) => ({
+    definition: _.get(options.schema, ['paths', path]),
+    original: ['paths', path],
+    regexp: pathToRegexp(path.replace(/\{/g, ':').replace(/\}/g, '')),
+    path,
+    pathDef,
+  }));
 
 const matchUrlWithSchema = (reqUrl) => {
   let url = parseUrl(reqUrl).pathname;
@@ -35,10 +36,7 @@ const decorateWithNullable = (schema) => {
     Object.keys(schema.properties).forEach((prop) => {
       if (schema.properties[prop]['x-nullable']) {
         schema.properties[prop] = {
-          oneOf: [
-            schema.properties[prop],
-            { type: 'null' },
-          ],
+          oneOf: [schema.properties[prop], { type: 'null' }],
         };
       }
     });
@@ -88,7 +86,7 @@ const resolveRequestModelSchema = (req) => {
       requestSchemas = pathObj[method].parameters;
     }
     if (requestSchemas && requestSchemas.length > 0) {
-      ([{ schema }] = requestSchemas);
+      [{ schema }] = requestSchemas;
     }
   }
   if (options.allowNullable) {
@@ -123,14 +121,14 @@ const validateResponse = (req, res, next) => {
   const origWrite = res.write;
 
   // eslint-disable-next-line
-  res.write = function (data) {
+  res.write = function(data) {
     if (typeof data !== 'undefined') {
       writtenData.push(data);
     }
   };
 
   // eslint-disable-next-line
-  res.end = function (data, encoding) {
+  res.end = function(data, encoding) {
     res.write = origWrite;
     res.end = origEnd;
 

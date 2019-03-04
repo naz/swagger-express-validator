@@ -109,7 +109,7 @@ describe('pet store', () => {
         });
     });
 
-    it('fails request with 400 when doesn\'t pass request schema validation', (done) => {
+    it("fails request with 400 when doesn't pass request schema validation", (done) => {
       const router = Router();
       router.post('/pet', (req, res) => {
         res.json({
@@ -199,7 +199,7 @@ describe('pet store', () => {
       validateResponse: true,
     };
 
-    it('fails request with 400 when doesn\'t pass request schema validation', (done) => {
+    it("fails request with 400 when doesn't pass request schema validation", (done) => {
       const router = Router();
       router.post('/pet', (req, res) => {
         res.json({
