@@ -1,7 +1,7 @@
 const express = require('express');
-const validator = require('../..');
 const bodyParser = require('body-parser');
 const HttpStatus = require('http-status-codes');
+const validator = require('../..');
 
 const createServer = (requestHandler, opts) => {
   const server = express();
