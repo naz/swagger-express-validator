@@ -289,4 +289,63 @@ describe('pet store', () => {
         });
     });
   });
+
+  describe('supports overriding ajv settings', () => {
+    const serverOpts = {
+      schema,
+      validateRequest: true,
+      validateResponse: true,
+      ajvRequestOptions: {
+        coerceTypes: true,
+      },
+      ajvResponseOptions: {
+        coerceTypes: true,
+      },
+    };
+
+    it('request passes after type coercion is applied', (done) => {
+      const router = Router();
+      router.post('/pet', (req, res) => {
+        res.json({
+          status: 'OK',
+        });
+      });
+      const app = createServer(router, serverOpts);
+      request(app)
+        .post('/pet')
+        .send({
+          id: '1',
+          name: 'Petty the Pet',
+          photoUrls: ['https://catphoto.com/best-cat'],
+        })
+        .expect(200)
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
+
+    it('response passes after coercion is applied', (done) => {
+      const router = Router();
+      router.get('/pet/:id', (req, res) => {
+        res.json({
+          id: '1',
+          age: 21,
+          name: 'Pet Name',
+          photoUrls: ['https://catphoto.com/best-cat'],
+        });
+      });
+      const app = createServer(router, serverOpts);
+
+      request(app)
+        .get('/pet/1')
+        .expect(200)
+        .end((err) => {
+          app.close();
+          if (err) throw err;
+          done();
+        });
+    });
+  });
 });

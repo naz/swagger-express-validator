@@ -65,6 +65,25 @@ return server.listen(3000);
 
 ```
 
+## Ajv configuration
+
+`swagger-express-validator` uses Ajv for schema validation under the hood. You can tweak many validation parameters by passing Ajv configuration overrides:
+
+```javascript
+server.use(validator({
+  schema,
+  validateRequest: true,
+  validateResponse: true,
+  ajvRequestOptions: {
+    coerceTypes: true,
+  },
+  ajvResponseOptions: {
+    coerceTypes: true,
+  },
+}));
+```
+
+See Ajv documentation for supported values.
 ## Debugging
 To see debug output use `DEBUG=swagger-express-validator` as an environmental variable when starting
 your project, eg.: `DEBUG=swagger-express-validator node server.js`. To gain more insights
@@ -74,6 +93,7 @@ on how this works see documentation of [debug](https://github.com/visionmedia/de
 - [Nazar Gargol](https://github.com/gargol)
 - [Isaac Stefanek](https://github.com/iadknet)
 - [James Gregory](https://github.com/jagregory)
+- [Igor Savin](https://github.com/kibertoad)
 
 ## Licence
 [MIT](https://github.com/gargol/swagger-express-validator/blob/master/LICENSE)
