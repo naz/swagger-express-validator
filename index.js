@@ -121,7 +121,7 @@ const validateResponse = (req, res, next) => {
         url: valueValidator.isURL,
       },
     },
-    ajvResponseOptions,
+    ajvResponseOptions
   ));
 
   const origEnd = res.end;
@@ -213,7 +213,7 @@ const validateRequest = (req, res, next) => {
         int64: valueValidator.isInt,
         url: valueValidator.isURL,
       },
-    }, ajvRequestOptions,
+    }, ajvRequestOptions
   ));
 
   const requestSchema = resolveRequestModelSchema(req);

@@ -16,6 +16,7 @@
   "scripts": {
     "test": "mocha ./test --ui bdd",
     "lint": "eslint ./",
+    "lint-fix": "eslint ./ --fix",
     "precommit": "npm run lint && npm test",
     "prepush": "npm run lint && npm test"
   },
