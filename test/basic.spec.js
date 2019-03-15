@@ -122,6 +122,31 @@ describe('basic', () => {
           done();
         });
     });
+
+    it('fails with 500 response code due to response object of in invalid format', (done) => {
+      const router = Router();
+      router.get('/status', (req, res) => {
+        res.send('dummy');
+      });
+      const app = createServer(router, {
+        schema,
+        validateRequest: false,
+        validateResponse: true,
+      });
+      request(app)
+        .get('/status')
+        .expect(500)
+        .expect((res) => {
+          if (!res.body.message.includes('Response schema validation failed')) {
+            throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
+          }
+        })
+        .end((err) => {
+          if (err) throw err;
+          app.close();
+          done();
+        });
+    });
   });
 
   describe('validates basic request', () => {
