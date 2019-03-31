@@ -90,7 +90,8 @@ const resolveRequestModelSchema = (req) => {
       requestSchemas = pathObj[method].parameters;
     }
     if (requestSchemas && requestSchemas.length > 0) {
-      ([{ schema }] = requestSchemas);
+      const bodyParam = _.find(requestSchemas, { in: 'body' });
+      schema = bodyParam && bodyParam.schema;
     }
   }
   if (options.allowNullable) {
