@@ -1,16 +1,12 @@
 language: node_js
 node_js:
-  - "v6"
-  - "stable"
-
-cache:
-  directories:
-  - node_modules
+  - '6'
+  - '8'
+  - '10'
+  - '11'
 
 branches:
   only:
     - master
-
-sudo: required
 
 script: npm test
