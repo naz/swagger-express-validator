@@ -8,6 +8,8 @@ const valueValidator = require('validator');
 
 let pathObjects = [];
 let options = {};
+let ajvRequestOptions;
+let ajvResponseOptions;
 
 const buildPathObjects = paths => _.map(paths, (pathDef, path) => ({
   definition: _.get(options.schema, ['paths', path]),
@@ -88,7 +90,8 @@ const resolveRequestModelSchema = (req) => {
       requestSchemas = pathObj[method].parameters;
     }
     if (requestSchemas && requestSchemas.length > 0) {
-      ([{ schema }] = requestSchemas);
+      const bodyParam = _.find(requestSchemas, { in: 'body' });
+      schema = bodyParam && bodyParam.schema;
     }
   }
   if (options.allowNullable) {
@@ -109,14 +112,18 @@ const sendData = (res, data, encoding) => {
 };
 
 const validateResponse = (req, res, next) => {
-  const ajv = new Ajv({
-    allErrors: true,
-    formats: {
-      int32: valueValidator.isInt,
-      int64: valueValidator.isInt,
-      url: valueValidator.isURL,
+  const ajv = new Ajv(Object.assign(
+    {},
+    {
+      allErrors: true,
+      formats: {
+        int32: valueValidator.isInt,
+        int64: valueValidator.isInt,
+        url: valueValidator.isURL,
+      },
     },
-  });
+    ajvResponseOptions
+  ));
 
   const origEnd = res.end;
   const writtenData = [];
@@ -206,14 +213,17 @@ const validateResponse = (req, res, next) => {
 };
 
 const validateRequest = (req, res, next) => {
-  const ajv = new Ajv({
-    allErrors: true,
-    formats: {
-      int32: valueValidator.isInt,
-      int64: valueValidator.isInt,
-      url: valueValidator.isURL,
-    },
-  });
+  const ajv = new Ajv(Object.assign(
+    {},
+    {
+      allErrors: true,
+      formats: {
+        int32: valueValidator.isInt,
+        int64: valueValidator.isInt,
+        url: valueValidator.isURL,
+      },
+    }, ajvRequestOptions
+  ));
 
   const requestSchema = resolveRequestModelSchema(req);
 
@@ -273,14 +283,18 @@ const validate = (req, res, next) => {
  * @param opts.allowNullable {boolean|true}
  * @param opts.requestValidationFn {function}
  * @param opts.responseValidationFn {function}
+ * @param [opts.ajvRequestOptions] {object}
+ * @param [opts.ajvResponseOptions] {object}
  * @returns {function(*=, *=, *=)}
  */
 const init = (opts = {}) => {
   debug('Initializing swagger-express-validator middleware');
-  options = _.defaults(opts, {
+  options = _.defaults({}, opts, {
     validateRequest: true,
     validateResponse: true,
     allowNullable: true,
+    ajvRequestOptions: {},
+    ajvResponseOptions: {},
   });
 
   if (options.schema) {
@@ -289,6 +303,7 @@ const init = (opts = {}) => {
     debug('Please provide schema option to properly initialize middleware');
     pathObjects = [];
   }
+  ({ ajvRequestOptions, ajvResponseOptions } = opts);
 
   return validate;
 };
