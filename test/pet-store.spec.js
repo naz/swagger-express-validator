@@ -52,12 +52,6 @@ describe('pet store', () => {
     });
 
     it('allows `nullable` filed in response', (done) => {
-      const opts = {
-        schema,
-        validateRequest: false,
-        validateResponse: true,
-        allowNullable: true
-      };
       const router = Router();
       router.get('/pet/:id', (req, res) => {
         res.json({
@@ -67,7 +61,7 @@ describe('pet store', () => {
           photoUrls: [],
         });
       });
-      const app = createServer(router, opts);
+      const app = createServer(router, optsValidateResponse);
 
       request(app)
         .get('/pet/1')

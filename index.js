@@ -281,7 +281,7 @@ const validate = (req, res, next) => {
  */
 const init = (opts = {}) => {
   debug('Initializing swagger-express-validator middleware');
-  options = _.defaults(opts, {
+  options = _.defaults({}, opts, {
     validateRequest: true,
     validateResponse: true,
     allowNullable: true,
