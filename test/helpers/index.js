@@ -24,15 +24,15 @@ function getOpts(schema, validateRequest, validateResponse) {
 }
 
 const createServerLegacy = (requestHandler, opts) => {
-  const server = express();
-  server.use(bodyParser.json());
-  server.use(validator(opts));
-  server.use('/', requestHandler);
-  server.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
+  const app = express();
+  app.use(bodyParser.json());
+  app.use(validator(opts));
+  app.use('/', requestHandler);
+  app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     res.status(HttpStatus.INTERNAL_SERVER_ERROR);
     res.json(err);
   });
-  return server.listen(3000);
+  return app;
 };
 
 module.exports = {
