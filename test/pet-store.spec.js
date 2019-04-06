@@ -2,7 +2,7 @@ const { Router } = require('express');
 const request = require('supertest');
 const { describe } = require('mocha/lib/mocha.js');
 const { it } = require('mocha/lib/mocha.js');
-const { createServer } = require('./helpers');
+const { createServerLegacy: createServer } = require('./helpers');
 
 const schema = require('./swagger-schemas/pet-store.json');
 
