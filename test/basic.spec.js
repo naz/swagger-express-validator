@@ -54,29 +54,48 @@ describe('basic', () => {
         .end(done);
     });
 
-    it('fails with 500 response code due to response object of in invalid format', (done) => {
-      const router = Router();
-      router.get('/status', (req, res) => {
+    it('fails with 500 response code due to response object of in invalid format, override content-type', (done) => {
+      const handler = (req, res) => {
         res.send('dummy');
-      });
-      const app = createServer(router, {
+      };
+      const opts = {
         schema,
+        preserveResponseContentType: false,
         validateRequest: false,
-        validateResponse: true,
-      });
+        validateResponse: true
+      };
+      const app = createServer(handler, opts, '/status');
       request(app)
         .get('/status')
         .expect(500)
         .expect((res) => {
-          if (!res.body.message.includes('Response schema validation failed')) {
+          if (!res.body.details.includes('Response schema validation failed')) {
             throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
           }
         })
-        .end((err) => {
-          if (err) throw err;
-          app.close();
-          done();
-        });
+        .end(done);
+    });
+
+    it('fails with 500 response code due to response object of in invalid format, preserve content-type', (done) => {
+      const handler = (req, res) => {
+        res.send('dummy');
+      };
+      const opts = {
+        schema,
+        preserveResponseContentType: true,
+        validateRequest: false,
+        validateResponse: true
+      };
+      const app = createServer(handler, opts, '/status');
+      request(app)
+        .get('/status')
+        .expect(500)
+        .expect((res) => {
+          if (!(res.text === '{"details":"Response schema validation failed for GET/status"}')) {
+            throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
+          }
+        })
+        .end(done);
     });
   });
 
