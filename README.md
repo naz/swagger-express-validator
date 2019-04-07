@@ -41,6 +41,8 @@ server.use(bodyParser.json());
 const opts = {
   schema, // Swagger schema
   preserveResponseContentType: false, // Do not override responses for validation errors to always be JSON, default is true
+  returnRequestErrors: true, // Include list of request validation errors with response, default is false
+  returnResponseErrors: true, // Include list of response validation errors with response, default is false
   validateRequest: true,
   validateResponse: true,
   requestValidationFn: (req, data, errors) => {
@@ -74,6 +76,8 @@ return server.listen(3000);
 server.use(validator({
   schema,
   preserveResponseContentType: false,
+  returnRequestErrors: true,
+  returnResponseErrors: true,
   validateRequest: true,
   validateResponse: true,
   ajvRequestOptions: {

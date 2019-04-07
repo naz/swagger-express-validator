@@ -47,8 +47,38 @@ describe('basic', () => {
         .get('/status')
         .expect(500)
         .expect((res) => {
-          if (!res.body.details.includes('Response schema validation failed')) {
+          if (!res.body.message.includes('Response schema validation failed')) {
             throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
+          }
+        })
+        .end(done);
+    });
+
+    it('fails with 500 response code due to invalid response object - returns errors', (done) => {
+      const opts = {
+        schema,
+        returnResponseErrors: true,
+        validateRequest: false,
+        validateResponse: true
+      };
+      const invalidHandler = (req, res) => {
+        res.json({
+          invalid: 'field',
+        });
+      };
+
+      const app = createServer(invalidHandler, opts, '/status');
+      request(app)
+        .get('/status')
+        .expect(500)
+        .expect((res) => {
+          if (!res.body.message.includes('Response schema validation failed')) {
+            throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
+          }
+
+          const error = res.body.errors[0];
+          if (error.message !== 'should have required property \'status\'') {
+            throw new Error(`invalid error message for: ${JSON.stringify(res.body)}`);
           }
         })
         .end(done);
@@ -69,7 +99,7 @@ describe('basic', () => {
         .get('/status')
         .expect(500)
         .expect((res) => {
-          if (!res.body.details.includes('Response schema validation failed')) {
+          if (!res.body.message.includes('Response schema validation failed')) {
             throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
           }
         })
@@ -91,7 +121,7 @@ describe('basic', () => {
         .get('/status')
         .expect(500)
         .expect((res) => {
-          if (!(res.text === '{"details":"Response schema validation failed for GET/status"}')) {
+          if (!(res.text === '{"message":"Response schema validation failed for GET/status"}')) {
             throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
           }
         })

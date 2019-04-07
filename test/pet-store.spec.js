@@ -1,8 +1,9 @@
 const { Router } = require('express');
 const request = require('supertest');
+const { okHandler } = require('middleware-testlab').handlers.express;
 const { describe } = require('mocha');
 const { it } = require('mocha');
-const { createServerLegacy: createServer, getOpts } = require('./helpers');
+const { createServerLegacy: createServer, createServer: createServerNew, getOpts } = require('./helpers');
 
 const schema = require('./swagger-schemas/pet-store.json');
 
@@ -85,20 +86,45 @@ describe('pet store', () => {
         .end(done);
     });
 
-    it('fails request with 400 when doesn\'t pass request schema validation', (done) => {
-      const router = Router();
-      router.post('/pet', (req, res) => {
-        res.json({
-          status: 'OK',
-        });
+    it('fails request with 400 when does not pass request schema validation', (done) => {
+      const app = createServerNew(okHandler, optsValidateRequest, {
+        method: 'post',
+        path: '/pet'
       });
-      const app = createServer(router, optsValidateRequest);
+
       request(app)
         .post('/pet')
         .send({
           name: 'hello',
         })
         .expect(400)
+        .end(done);
+    });
+
+    it('fails request with 400 when does not pass request schema validation - returns errors', (done) => {
+      const opts = {
+        schema,
+        returnRequestErrors: true,
+        validateRequest: true,
+        validateResponse: false
+      };
+      const app = createServerNew(okHandler, opts, {
+        method: 'post',
+        path: '/pet'
+      });
+
+      request(app)
+        .post('/pet')
+        .send({
+          name: 'hello',
+        })
+        .expect(400)
+        .expect((res) => {
+          const error = res.body.errors[0];
+          if (error.message !== 'should have required property \'photoUrls\'') {
+            throw new Error(`invalid response body message for: ${JSON.stringify(res.body)}`);
+          }
+        })
         .end(done);
     });
 
