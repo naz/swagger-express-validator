@@ -6,6 +6,8 @@ node_js:
   - '10'
   - '11'
 
+cache: yarn
+
 branches:
   only:
     - master
