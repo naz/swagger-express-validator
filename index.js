@@ -184,9 +184,13 @@ const validateResponse = (req, res, next) => {
             sendData(res, data, encoding);
             return;
           }
-          next({
+          const resultError = {
             message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
-          });
+          };
+          if (options.returnResponseErrors) {
+            err.errors = [{ message: 'Invalid response format' }];
+          }
+          next(resultError);
           return;
         }
       }
@@ -202,6 +206,9 @@ const validateResponse = (req, res, next) => {
           const err = {
             message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
           };
+          if (options.returnResponseErrors) {
+            err.errors = validator.errors;
+          }
           next(err);
         }
       } else {
@@ -248,6 +255,9 @@ const validateRequest = (req, res, next) => {
         const err = {
           message: `Request schema validation failed for ${req.method}${req.originalUrl}`,
         };
+        if (options.returnRequestErrors) {
+          err.errors = validator.errors;
+        }
         res.status(400);
         res.json(err);
       }
@@ -293,6 +303,8 @@ const init = (opts = {}) => {
   debug('Initializing swagger-express-validator middleware');
   options = _.defaults({}, opts, {
     preserveResponseContentType: true,
+    returnResponseErrors: false,
+    returnRequestErrors: false,
     validateRequest: true,
     validateResponse: true,
     allowNullable: true,
