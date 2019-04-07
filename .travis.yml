@@ -1,3 +1,4 @@
+dist: xenial
 language: node_js
 node_js:
   - '6'
@@ -5,8 +6,8 @@ node_js:
   - '10'
   - '11'
 
+cache: yarn
+
 branches:
   only:
     - master
-
-script: npm test
