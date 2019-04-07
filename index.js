@@ -174,10 +174,20 @@ const validateResponse = (req, res, next) => {
         try {
           val = JSON.parse(val);
         } catch (err) {
+          if (!options.preserveResponseContentType) {
+            res.set('Content-Type', ''); // Reset content-type since it is no longer valid
+          }
           err.failedValidation = true;
           err.message = 'Value expected to be an array/object but is not';
-
-          throw err;
+          if (options.responseValidationFn) {
+            options.responseValidationFn(req, data, [err]);
+            sendData(res, data, encoding);
+            return;
+          }
+          next({
+            message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
+          });
+          return;
         }
       }
 
@@ -282,6 +292,7 @@ const validate = (req, res, next) => {
 const init = (opts = {}) => {
   debug('Initializing swagger-express-validator middleware');
   options = _.defaults({}, opts, {
+    preserveResponseContentType: true,
     validateRequest: true,
     validateResponse: true,
     allowNullable: true,
