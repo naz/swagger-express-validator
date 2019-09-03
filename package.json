@@ -1,6 +1,6 @@
 {
   "name": "swagger-express-validator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "node": ">=6.0.0"
   },
@@ -28,9 +28,9 @@
   "author": "Nazar Gargol",
   "license": "MIT",
   "dependencies": {
-    "ajv": "6.10.0",
+    "ajv": "^6.10.2",
     "debug": "3.2.6",
-    "lodash": "4.17.13",
+    "lodash": "^4.17.15",
     "path-to-regexp": "2.2.1",
     "validator": "10.11.0"
   },
