@@ -269,6 +269,45 @@ describe('pet store', () => {
         })
         .end(done);
     });
+
+    it('should process valid string response', (done) => {
+      const router = Router();
+      router.get('/firstname/:username', (req, res) => {
+        res.json('firstname1');
+      });
+      const app = createServer(router, optsValidateAll);
+
+      request(app)
+        .get('/firstname/user1')
+        .expect(200)
+        .end(done);
+    });
+
+    it('fails with 500 response code due to invalid response string return', (done) => {
+      const router = Router();
+      router.get('/firstname/:username', (req, res) => {
+        res.json({});
+      });
+      const app = createServer(router, optsValidateAll);
+
+      request(app)
+        .get('/firstname/user1')
+        .expect(500)
+        .end(done);
+    });
+
+    it('should process valid boolean response', (done) => {
+      const router = Router();
+      router.get('/isValidUser/:username', (req, res) => {
+        res.json(false);
+      });
+      const app = createServer(router, optsValidateAll);
+
+      request(app)
+        .get('/isValidUser/user1')
+        .expect(200)
+        .end(done);
+    });
   });
 
   describe('supports overriding ajv settings', () => {
