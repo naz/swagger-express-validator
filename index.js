@@ -209,7 +209,9 @@ const validateResponse = (req, res, next) => {
           if (options.returnResponseErrors) {
             err.errors = validator.errors;
           }
-          next(err);
+          res.status(400);
+          res.json(err);
+          next();
         }
       } else {
         debug('Response validation success');

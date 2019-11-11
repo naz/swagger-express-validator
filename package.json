@@ -32,7 +32,8 @@
     "debug": "3.2.6",
     "lodash": "^4.17.15",
     "path-to-regexp": "2.4.0",
-    "validator": "10.11.0"
+    "validator": "10.11.0",
+    "swagger-express-validator": "^1.0.0"
   },
   "devDependencies": {
     "body-parser": "1.19.0",
