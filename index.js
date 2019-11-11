@@ -204,7 +204,7 @@ const validateResponse = (req, res, next) => {
           sendData(res, val, encoding);
         } else {
           const err = {
-            message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
+            message: `Custom Fork Response schema validation failed for ${req.method}${req.originalUrl}`,
           };
           if (options.returnResponseErrors) {
             err.errors = validator.errors;
