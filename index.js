@@ -200,7 +200,7 @@ const validateResponse = (req, res, next) => {
       if (!validation) {
         debug(`  Response validation errors: \n${util.inspect(validator.errors)}`);
         if (options.responseValidationFn) {
-          options.responseValidationFn(req, val, validator.errors);
+          options.responseValidationFn(req, val, validator.errors, res);
           sendData(res, val, encoding);
         } else {
           const err = {
@@ -210,7 +210,10 @@ const validateResponse = (req, res, next) => {
             err.errors = validator.errors;
           }
           res.status(400);
-          res.json(err);
+          res.json({
+            code: 0,
+            message: 'Response validation failed.'
+          });
           next();
         }
       } else {
