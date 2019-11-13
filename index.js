@@ -36,14 +36,14 @@ const decorateWithNullable = (schema) => {
   if (schema && schema.properties) {
     Object.keys(schema.properties).forEach((prop) => {
       if (schema.properties[prop]['x-nullable']) {
-        schema.properties[prop] = {
-          oneOf: [
-            schema.properties[prop],
-            { type: 'null' },
-          ],
-        };
-      }
-    });
+      schema.properties[prop] = {
+        oneOf: [
+          schema.properties[prop],
+          { type: 'null' },
+        ],
+      };
+    }
+  });
   } else if (schema && schema.items) {
     schema.items = decorateWithNullable(schema.items);
   }
@@ -200,21 +200,16 @@ const validateResponse = (req, res, next) => {
       if (!validation) {
         debug(`  Response validation errors: \n${util.inspect(validator.errors)}`);
         if (options.responseValidationFn) {
-          options.responseValidationFn(req, val, validator.errors, res);
+          options.responseValidationFn(req, val, validator.errors);
           sendData(res, val, encoding);
         } else {
           const err = {
-            message: `Custom Fork Response schema validation failed for ${req.method}${req.originalUrl}`,
+            message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
           };
           if (options.returnResponseErrors) {
             err.errors = validator.errors;
           }
-          res.status(400);
-          res.json({
-            code: 0,
-            message: 'Response validation failed.'
-          });
-          next();
+          next(err);
         }
       } else {
         debug('Response validation success');
