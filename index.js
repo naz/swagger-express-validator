@@ -19,11 +19,20 @@ const buildPathObjects = paths => _.map(paths, (pathDef, path) => ({
   pathDef,
 }));
 
-const matchUrlWithSchema = (reqUrl) => {
-  let url = parseUrl(reqUrl).pathname;
+const removeBasePath = (basePath, url) => (url.indexOf(basePath) === 0
+  ? url.replace(basePath, '')
+  : url);
+
+const normalizeUrl = (url) => {
   if (options.schema.basePath) {
-    url = url.replace(options.schema.basePath, '');
+    return removeBasePath(options.schema.basePath, url);
   }
+  return url;
+};
+
+
+const matchUrlWithSchema = (reqUrl) => {
+  const url = normalizeUrl(parseUrl(reqUrl).pathname);
   const pathObj = pathObjects.filter(obj => url.match(obj.regexp));
   let match = null;
   if (pathObj[0]) {
