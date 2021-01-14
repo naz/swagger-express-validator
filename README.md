@@ -96,7 +96,7 @@ your project, eg.: `DEBUG=swagger-express-validator node server.js`. To gain mor
 on how this works see documentation of [debug](https://github.com/visionmedia/debug) library
 
 ## Contributors
-- [Nazar Gargol](https://github.com/gargol)
+- [Naz](https://github.com/naz)
 - [Isaac Stefanek](https://github.com/iadknet)
 - [James Gregory](https://github.com/jagregory)
 - [Igor Savin](https://github.com/kibertoad)
