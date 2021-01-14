@@ -19,11 +19,19 @@ const buildPathObjects = paths => _.map(paths, (pathDef, path) => ({
   pathDef,
 }));
 
+const stripBasePath = (url) => {
+    const basePath = options.schema.basePath;
+
+    if (basePath && (url.indexOf(basePath) == 0)) {
+        return url.slice(basePath.length);
+    } else {
+        return url;
+    }
+};
+
 const matchUrlWithSchema = (reqUrl) => {
-  let url = parseUrl(reqUrl).pathname;
-  if (options.schema.basePath) {
-    url = url.replace(options.schema.basePath, '');
-  }
+  let url = stripBasePath(parseUrl(reqUrl).pathname);
+
   const pathObj = pathObjects.filter(obj => url.match(obj.regexp));
   let match = null;
   if (pathObj[0]) {
@@ -143,7 +151,7 @@ const validateResponse = (req, res, next) => {
 
     const responseSchema = resolveResponseModelSchema(req, res);
     if (!responseSchema) {
-      debug('Response validation skipped: no matching response schema');
+      debug(`Response validation skipped: no matching response schema for ${req.method} ${req.originalUrl}`);
       sendData(res, data, encoding);
     } else {
       let val;
@@ -204,7 +212,7 @@ const validateResponse = (req, res, next) => {
           sendData(res, val, encoding);
         } else {
           const err = {
-            message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
+            message: `Response schema validation failed for ${req.method} ${req.originalUrl}`,
           };
           if (options.returnResponseErrors) {
             err.errors = validator.errors;
@@ -237,7 +245,7 @@ const validateRequest = (req, res, next) => {
   const requestSchema = resolveRequestModelSchema(req);
 
   if (!requestSchema) {
-    debug('Request validation skipped: no matching request schema');
+    debug(`Request validation skipped: no matching request schema for ${req.method} ${req.originalUrl}`);
     if (options.validateResponse) {
       validateResponse(req, res, next);
     } else {
@@ -247,13 +255,13 @@ const validateRequest = (req, res, next) => {
     const validator = ajv.compile(requestSchema);
     const validation = validator(_.cloneDeep(req.body));
     if (!validation) {
-      debug(`  Request validation errors: \n${util.inspect(validator.errors)}`);
+      debug(`  Request validation errors for ${req.method} ${req.originalUrl}: \n${util.inspect(validator.errors)}`);
       if (options.requestValidationFn) {
         options.requestValidationFn(req, req.body, validator.errors);
         next();
       } else {
         const err = {
-          message: `Request schema validation failed for ${req.method}${req.originalUrl}`,
+          message: `Request schema validation failed for ${req.method} ${req.originalUrl}`,
         };
         if (options.returnRequestErrors) {
           err.errors = validator.errors;
@@ -262,7 +270,7 @@ const validateRequest = (req, res, next) => {
         res.json(err);
       }
     } else {
-      debug('Request validation success');
+      debug(`Request validation success for ${req.method} ${req.originalUrl}`);
       if (options.validateResponse) {
         validateResponse(req, res, next);
       } else {
