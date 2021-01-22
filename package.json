@@ -25,7 +25,7 @@
     "connect",
     "express"
   ],
-  "author": "Nazar Gargol",
+  "author": "Naz",
   "license": "MIT",
   "dependencies": {
     "ajv": "^6.10.2",
