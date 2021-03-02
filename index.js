@@ -113,10 +113,6 @@ const resolveRequestModelSchema = (req) => {
 };
 
 const sendData = (res, data, encoding) => {
-  // 'res.end' requires a Buffer or String so if it's not one, create a String
-  if (!(data instanceof Buffer) && !_.isString(data)) {
-    data = JSON.stringify(data);
-  }
   res.end(data, encoding);
 };
 
@@ -210,7 +206,7 @@ const validateResponse = (req, res, next) => {
         debug(`  Response validation errors: \n${util.inspect(validator.errors)}`);
         if (options.responseValidationFn) {
           options.responseValidationFn(req, val, validator.errors);
-          sendData(res, val, encoding);
+          sendData(res, data, encoding);
         } else {
           const err = {
             message: `Response schema validation failed for ${req.method}${req.originalUrl}`,
@@ -222,7 +218,7 @@ const validateResponse = (req, res, next) => {
         }
       } else {
         debug('Response validation success');
-        sendData(res, val, encoding);
+        sendData(res, data, encoding);
       }
     }
   };

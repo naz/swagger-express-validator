@@ -1474,6 +1474,66 @@
           }
         }
       }
+    },
+    "/firstname/{username}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get user first name by user name",
+        "description": "",
+        "operationId": "getUserByName",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The name that needs to be fetched. Use user1 for testing. ",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/isValidUser/{username}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Checks if it is a valid username",
+        "description": "",
+        "operationId": "getUserByName",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The name that needs to be fetched. Use user1 for testing. ",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
     }
   },
   "securityDefinitions": {
