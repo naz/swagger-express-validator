@@ -204,8 +204,10 @@ const validateResponse = (req, res, next) => {
         }
       }
 
+      val = _.cloneDeep(val);
+
       const validator = ajv.compile(responseSchema);
-      const validation = validator(_.cloneDeep(val));
+      const validation = validator(val);
       if (!validation) {
         debug(`  Response validation errors: \n${util.inspect(validator.errors)}`);
         if (options.responseValidationFn) {
@@ -253,8 +255,10 @@ const validateRequest = (req, res, next) => {
       next();
     }
   } else {
+    req.body = _.cloneDeep(req.body);
+
     const validator = ajv.compile(requestSchema);
-    const validation = validator(_.cloneDeep(req.body));
+    const validation = validator(req.body);
     if (!validation) {
       debug(`  Request validation errors: \n${util.inspect(validator.errors)}`);
       if (options.requestValidationFn) {
